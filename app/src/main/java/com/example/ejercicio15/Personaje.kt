@@ -7,6 +7,8 @@ class Personaje() {
     var fuerza: Int = 0
     var vida : Int = 200
     var defensa: Int = 0
+    var raza: String = ""
+    var clase: String = ""
     var monedero: Int = 0
         get() = field
 

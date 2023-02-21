@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.gson.Gson
 
 private lateinit var binding: ActivityLoginPromptBinding
 
@@ -19,6 +20,8 @@ class LoginPromptActivity : AppCompatActivity() {
         binding = ActivityLoginPromptBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        crearPersonaje()
+
         // Chequeamos si ya hay un usuario logueado
         checkUserPreviousLogin()
 
@@ -27,12 +30,27 @@ class LoginPromptActivity : AppCompatActivity() {
 
     }
 
+    private fun crearPersonaje() {
+        val personaje = Personaje()
+
+        val sharedPreference = getSharedPreferences("PERSONAJE_APLICACION", Context.MODE_PRIVATE)
+        val editor = sharedPreference.edit()
+        val gson = Gson()
+        val jsonPersonajeCheck = sharedPreference.getString("PERSONAJE", null)
+
+        if(jsonPersonajeCheck == null){
+            val json = gson.toJson(personaje)
+            editor.putString("PERSONAJE", json)
+            editor.apply()
+        }
+    }
+
     private fun checkUserPreviousLogin() {
         val sharedPreference = getSharedPreferences("USER_PREFS", Context.MODE_PRIVATE)
         val email = sharedPreference.getString("USER_EMAIL", null)
 
         if(email != null) {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, SeleccionaClase::class.java)
             startActivity(intent)
         }
     }
@@ -87,7 +105,14 @@ class LoginPromptActivity : AppCompatActivity() {
         editor.putString("USER_EMAIL", email)
         editor.apply()
 
-        val intent = Intent(this, MainActivity::class.java)
+        val personaje = recuperarPersonaje()
+
+        var intent = Intent()
+        intent = if(personaje.raza.isEmpty() || personaje.clase.isEmpty())
+            Intent(this, SeleccionaClase::class.java)
+        else
+            Intent(this, MainActivity::class.java)
+
         startActivity(intent)
     }
 
@@ -121,5 +146,12 @@ class LoginPromptActivity : AppCompatActivity() {
                 showAlert(e.message.toString())
             }
         }
+    }
+
+    private fun recuperarPersonaje(): Personaje {
+        val sharedPreferences = getSharedPreferences("PERSONAJE_APLICACION", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = sharedPreferences.getString("PERSONAJE", "")
+        return gson.fromJson(json, Personaje::class.java)
     }
 }

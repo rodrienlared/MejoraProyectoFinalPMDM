@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         cambiarImagenInferiorConTiempo()
 
         initCityBossesFile()
-        crearPersonaje()
         funcionDado()
     }
 
@@ -55,21 +54,6 @@ class MainActivity : AppCompatActivity() {
 
         if(sharedPreference.getInt("CITY_BOSSES_REMAINING", 0) == 0){
             editor.putInt("CITY_BOSSES_REMAINING", 0)
-            editor.apply()
-        }
-    }
-
-    private fun crearPersonaje() {
-        val personaje = Personaje()
-
-        val sharedPreference = getSharedPreferences("PERSONAJE_APLICACION", Context.MODE_PRIVATE)
-        val editor = sharedPreference.edit()
-        val gson = Gson()
-        val jsonPersonajeCheck = sharedPreference.getString("PERSONAJE", null)
-
-        if(jsonPersonajeCheck == null){
-            val json = gson.toJson(personaje)
-            editor.putString("PERSONAJE", json)
             editor.apply()
         }
     }
